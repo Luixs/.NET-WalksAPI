@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Walks.API.CustomActionFilters;
 using Walks.API.Data;
 using Walks.API.Models.Domain;
 using Walks.API.Models.DTO;
@@ -87,12 +88,10 @@ namespace Walks.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
+        [ValidadeModel]
         public async Task<IActionResult> CreateNewRegion([FromBody] AddRegionDto model)
         {
             if (model.Name.IsNullOrEmpty() || model.Code.IsNullOrEmpty()) return BadRequest("The code and name are required!");
-
-            // --- Validate Update
-            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var regionDB = _mapper.Map<Region>(model);
 

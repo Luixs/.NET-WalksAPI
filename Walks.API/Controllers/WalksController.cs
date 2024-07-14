@@ -73,7 +73,7 @@ namespace Walks.API.Controllers
         /// <param name="id"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPut]
         [Route("{id:Guid}")]
         public async Task<IActionResult> UpdateWalk([FromRoute] Guid id, [FromBody] RequestWalkDto model)
         {
