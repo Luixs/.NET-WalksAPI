@@ -41,9 +41,9 @@ namespace Walks.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> GetAllWalks()
+        public async Task<IActionResult> GetAllWalks([FromQuery] string? filterOn, [FromQuery] string? filterQuery, [FromQuery] string? sortBy, [FromQuery] bool? isSortAsc, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 1000)
         {
-            var dbList = await _walkRepository.GetAllAsync();
+            var dbList = await _walkRepository.GetAllAsync(filterOn, filterQuery, sortBy, isSortAsc ?? true, pageNumber, pageSize);
             var dtoList = _mapper.Map<List<WalkDto>>(dbList);
 
             return Ok(dtoList);
