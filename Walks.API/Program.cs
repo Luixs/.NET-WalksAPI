@@ -5,6 +5,7 @@ using Walks.API.Mapping;
 using Walks.API.Repositories;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,16 +16,44 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//--------------------------------------------------------------------------------
+// --- ADDING DB'S --------------------------------------------------------------
 builder.Services.AddDbContext<WalksDbContext>(option =>
 option.UseSqlServer(builder.Configuration.GetConnectionString("WalksCS")));
-
 builder.Services.AddDbContext<WalksAuthDbContext>(option =>
 option.UseSqlServer(builder.Configuration.GetConnectionString("WalksAuthCS")));
+//--------------------------------------------------------------------------------
 
+//--------------------------------------------------------------------------------
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
 builder.Services.AddScoped<IWalkRepository, SQLWalkRepository>();
+builder.Services.AddScoped<ITokenRepository, SQLTokenRepository>();
+//--------------------------------------------------------------------------------
 
+//--------------------------------------------------------------------------------
+// --- AUTOMAPPER (DTO<->DB) MODELS ----------------------------------------------
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+//--------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------
+// --- ADD IDENTITY --------------------------------------------------------------
+
+builder.Services.AddIdentityCore<IdentityUser>()
+    .AddRoles<IdentityRole>()
+    .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("Walks")
+    .AddEntityFrameworkStores<WalksAuthDbContext>()
+    .AddDefaultTokenProviders();
+
+// -- Config identity
+builder.Services.Configure<IdentityOptions>(options => {
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
+});
+//--------------------------------------------------------------------------------
 
 // --- Adding Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
