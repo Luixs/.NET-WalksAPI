@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Walks.API.CustomActionFilters;
@@ -11,6 +12,7 @@ namespace Walks.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RegionsController : ControllerBase
     {
         private readonly WalksDbContext _dbContext;
@@ -91,7 +93,7 @@ namespace Walks.API.Controllers
         [ValidadeModel]
         public async Task<IActionResult> CreateNewRegion([FromBody] AddRegionDto model)
         {
-            if (model.Name.IsNullOrEmpty() || model.Code.IsNullOrEmpty()) return BadRequest("The code and name are required!");
+            if (String.IsNullOrEmpty(model.Name) || String.IsNullOrEmpty(model.Code)) return BadRequest("The code and name are required!");
 
             var regionDB = _mapper.Map<Region>(model);
 
@@ -114,7 +116,7 @@ namespace Walks.API.Controllers
         {
             try
             {
-                if (model.Name.IsNullOrEmpty() && model.Code.IsNullOrEmpty() && model.RegionImageUrl.IsNullOrEmpty()) return BadRequest("Passing at least one parameter to change.");
+                if (String.IsNullOrEmpty(model.Name) && String.IsNullOrEmpty(model.Code) && String.IsNullOrEmpty(model.RegionImageUrl)) return BadRequest("Passing at least one parameter to change.");
 
                 // --- Validate Update
                 if (!ModelState.IsValid) return BadRequest(ModelState); 

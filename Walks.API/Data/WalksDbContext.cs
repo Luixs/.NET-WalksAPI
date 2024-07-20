@@ -7,7 +7,7 @@ namespace Walks.API.Data
     {
         // --- We create that Contructor to inject the connection string
         // to the program when we gonna call this context.
-        public WalksDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)         
+        public WalksDbContext(DbContextOptions<WalksDbContext> dbContextOptions) : base(dbContextOptions)         
         {
 
         }

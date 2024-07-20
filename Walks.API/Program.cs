@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Walks.API.Data;
 using Walks.API.Mapping;
 using Walks.API.Repositories;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +18,26 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<WalksDbContext>(option =>
 option.UseSqlServer(builder.Configuration.GetConnectionString("WalksCS")));
 
+builder.Services.AddDbContext<WalksAuthDbContext>(option =>
+option.UseSqlServer(builder.Configuration.GetConnectionString("WalksAuthCS")));
+
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
 builder.Services.AddScoped<IWalkRepository, SQLWalkRepository>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+// --- Adding Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    });
 
 var app = builder.Build();
 
@@ -31,6 +50,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
