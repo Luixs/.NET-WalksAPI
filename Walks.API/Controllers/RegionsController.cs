@@ -12,7 +12,6 @@ namespace Walks.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class RegionsController : ControllerBase
     {
         private readonly WalksDbContext _dbContext;
@@ -25,11 +24,13 @@ namespace Walks.API.Controllers
             this._dbContext = walksDbContext;
             this._regionRepository = regionRepository;
         }
+
         /// <summary>
         /// GET ALL REGIONS FROM THE DB
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [Authorize(Roles = "Reader,Writer")]
         public async Task<IActionResult> GetAllRegions()
         {
             // -- Get data from DB
@@ -62,6 +63,7 @@ namespace Walks.API.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("{id:guid}")]
+        [Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetRegionById([FromRoute]Guid id)
         {
             // --- Get data from DB
@@ -91,6 +93,7 @@ namespace Walks.API.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidadeModel]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> CreateNewRegion([FromBody] AddRegionDto model)
         {
             if (String.IsNullOrEmpty(model.Name) || String.IsNullOrEmpty(model.Code)) return BadRequest("The code and name are required!");
@@ -112,6 +115,7 @@ namespace Walks.API.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> UpdateRegion([FromRoute] Guid id, [FromBody] AddRegionDto model)
         {
             try
@@ -147,6 +151,7 @@ namespace Walks.API.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("{id:guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> DeleteRegion([FromRoute] Guid id)
         {
             try
