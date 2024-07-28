@@ -8,12 +8,26 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
+//--------------------------------------------------------------------------------
+// --- Log System ----------------------------------------------------------------
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .MinimumLevel.Information()
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+
+//--------------------------------------------------------------------------------
+// --- Add services to the container ---------------------------------------------
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
+//--------------------------------------------------------------------------------
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -68,7 +82,6 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 //--------------------------------------------------------------------------------
 // --- ADD IDENTITY --------------------------------------------------------------
-
 builder.Services.AddIdentityCore<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("Walks")
