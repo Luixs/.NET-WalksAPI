@@ -40,7 +40,6 @@ namespace Walks.API.Controllers
         {
             try
             {
-
                 // -- Get data from DB
                 var regions = await _regionRepository.GetAllAsync();
 
